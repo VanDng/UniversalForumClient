@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UniversalForumClient
+namespace UniversalForumClient.Core
 {
     public class Post
     {

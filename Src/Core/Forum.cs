@@ -4,16 +4,19 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using UniversalForumClient.HttpClient;
 
-namespace ForumConnector
+namespace UniversalForumClient.Core
 {
     public class Forum
     {
-        private HttpClient _httpClient;
+        private IHttpClient _httpClient;
 
+        // An ID can be "some-thing-special.99" or just "99",
+        // it's only SEO matter, here we don't need to care about it
         public string Id { get; private set; }
 
-        public Forum(HttpClient httpClient, string forumId)
+        public Forum(IHttpClient httpClient, string forumId)
         {
             _httpClient = httpClient;
             
@@ -24,9 +27,9 @@ namespace ForumConnector
         {
             List<Forum> forums = new List<Forum>();
 
-            var html_sourcce = await FetchHtmlSource(1);
+            var htmlSourcce = await FetchHtmlSource(1);
 
-            string[] forumIds = ExtractChildForumIds(html_sourcce);
+            string[] forumIds = ExtractChildForumIds(htmlSourcce);
 
             foreach (var forumId in forumIds)
             {
@@ -78,17 +81,17 @@ namespace ForumConnector
 
         private async Task<string> FetchHtmlSource(int pageIndex)
         {
-            string html_source = string.Empty;
+            string htmlSource = string.Empty;
 
-            string uri = string.Format("forums/{0}/page-{1}", Id, pageIndex);
+            string uri = UriManager.ForumUri(Id, pageIndex);
 
             var checkResponse = await _httpClient.GetAsync(uri);
             if (checkResponse.IsSuccessStatusCode)
             {
-                html_source = await checkResponse.Content.ReadAsStringAsync();
+                htmlSource = await checkResponse.Content.ReadAsStringAsync();
             }
 
-            return html_source;
+            return htmlSource;
         }
     }
 }

@@ -6,16 +6,18 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using UniversalForumClient;
+using UniversalForumClient.HttpClient;
 
-namespace ForumConnector
+namespace UniversalForumClient.Core
 {
     public class Thread
     {
-        private HttpClient _httpClient;
+        private IHttpClient _httpClient;
 
         public string Id { get; private set; }
 
-        public Thread(HttpClient httpClient, string threadId)
+        public Thread(IHttpClient httpClient, string threadId)
         {
             _httpClient = httpClient;
             Id = threadId;

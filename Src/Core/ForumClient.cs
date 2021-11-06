@@ -1,17 +1,19 @@
-﻿using System;
+﻿using UniversalForumClient;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using UniversalForumClient.HttpClient;
+using System.Net.Http;
 
-namespace UniversalForumClient
+namespace UniversalForumClient.Core
 {
     public class ForumClient : IDisposable
     {
         private string _homePageUrl;
-        private HttpClient _httpClient;
+        private IHttpClient _httpClient;
         private User _user { get; set; }
 
         public void Dispose()
@@ -26,7 +28,7 @@ namespace UniversalForumClient
         {
             _homePageUrl = homePageUrl;
 
-            _httpClient = new HttpClient();
+            _httpClient = new HttpClientWrapper();
             _httpClient.BaseAddress = new Uri(_homePageUrl);
 
             _user = null;
@@ -36,7 +38,7 @@ namespace UniversalForumClient
         {
             bool isSuccess = false;
 
-            _user = new ForumConnector.User();
+            _user = new User();
             _user.UserName = userName;
             _user.Password = password;
 
@@ -75,12 +77,6 @@ namespace UniversalForumClient
         {
             Forum forum = new Forum(_httpClient, forumId);
             return forum;
-        }
-
-        public Thread GetThread(string threadId)
-        {
-            Thread thread = new Thread(_httpClient, threadId);
-            return thread;
         }
     }
 }
