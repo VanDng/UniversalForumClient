@@ -38,7 +38,7 @@ namespace TestProject1
 
         public void SetHttpResponse(string content)
         {
-            var byteArray = Encoding.Unicode.GetBytes(content);
+            var byteArray = Encoding.ASCII.GetBytes(content);
             var byteArrayContent = new ByteArrayContent(byteArray);
 
             _httpResponseMessage.Content = byteArrayContent;
@@ -51,18 +51,26 @@ namespace TestProject1
 
         public Task<HttpResponseMessage> GetAsync(string uri)
         {
-            return new Task<HttpResponseMessage>(() =>
+            var t = new Task<HttpResponseMessage>(() =>
             {
                 return _httpResponseMessage;
             });
+
+            t.Start();
+
+            return t;
         }
 
         public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content)
         {
-            return new Task<HttpResponseMessage>(() =>
+            var t =  new Task<HttpResponseMessage>(() =>
             {
                 return _httpResponseMessage;
             });
+
+            t.Start();
+
+            return t;
         }
     }
 }

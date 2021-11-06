@@ -2,3 +2,4 @@ Src/bin
 Src/obj
 Test/*/bin
 Test/*/obj
+.vs
