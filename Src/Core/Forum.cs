@@ -18,18 +18,21 @@ namespace UniversalForumClient.Core
         // it's only SEO matter, here we don't need to care about it
         public string Id { get; private set; }
 
-        public Forum(IHttpClient httpClient, string forumId)
+        public int PageNumber { get; private set; }
+
+        public Forum(IHttpClient httpClient, string forumId, int pageNumber = 1)
         {
             _httpClient = httpClient;
             
             Id = forumId;
+            PageNumber = pageNumber;
         }
 
         public async Task<Forum[]> GetChildForums()
         {
             List<Forum> forums = new List<Forum>();
 
-            var htmlSourcce = await FetchHtmlSource(1);
+            var htmlSourcce = await FetchHtmlSource();
 
             string[] forumIds = ExtractChildForumIds(htmlSourcce);
 
@@ -43,15 +46,29 @@ namespace UniversalForumClient.Core
 
         public async Task<int> GetTotalPage()
         {
-            // TODO
-            return 1;
+            var htmlSourcce = await FetchHtmlSource();
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(htmlSourcce);
+
+            var nav = doc.DocumentNode.SelectSingleNode("//div[@class='PageNav']");
+
+            var totalPage = -1;
+            int.TryParse(nav.Attributes["data-last"].Value, out totalPage);
+
+            return totalPage;
         }
 
-        public async Task<Thread[]> GetThreads(int pageIndex)
+        public Forum GoToPage(int pageNumber)
+        {
+            return new Forum(_httpClient, this.Id, pageNumber);
+        }
+
+        public async Task<Thread[]> GetThreads()
         {
             List<Thread> threads = new List<Thread>();
 
-            var html_sourcce = await FetchHtmlSource(pageIndex);
+            var html_sourcce = await FetchHtmlSource();
 
             string[] threadIds = ExtractThreadIds(html_sourcce);
 
@@ -63,12 +80,12 @@ namespace UniversalForumClient.Core
             return threads.ToArray();
         }
 
-        private string[] ExtractChildForumIds(string html_source)
+        private string[] ExtractChildForumIds(string htmlSource)
         {
             List<string> forumIds = new List<string>();
 
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(html_source);
+            doc.LoadHtml(htmlSource);
 
             var forumHrefs = doc.DocumentNode.SelectNodes("//ol[@id='forums'] " +
                                                           "//a[starts-with(@href,'forums/') and '/' = substring(@href, string-length(@href)-string-length('/')+1)]");
@@ -84,20 +101,33 @@ namespace UniversalForumClient.Core
             return forumIds.ToArray();
         }
 
-        private string[] ExtractThreadIds(string html_source)
+        private string[] ExtractThreadIds(string htmlSource)
         {
             List<string> threadIds = new List<string>();
 
-            // TODO
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(htmlSource);
+
+            var threadHrefs = doc.DocumentNode.SelectNodes("//a[starts-with(@href,'threads/') and '/' = substring(@href, string-length(@href)-string-length('/')+1)]");
+
+            foreach (var threadHref in threadHrefs)
+            {
+                var href = threadHref.Attributes["href"].Value;
+                var threadId = href.Replace("/", "").Replace("threads", "");
+
+                threadIds.Add(threadId);
+            }
+
+            threadIds = threadIds.Distinct().ToList();
 
             return threadIds.ToArray();
         }
 
-        private async Task<string> FetchHtmlSource(int pageIndex)
+        private async Task<string> FetchHtmlSource()
         {
             string htmlSource = string.Empty;
 
-            string uri = UriManager.ForumUri(Id, pageIndex);
+            string uri = UriManager.ForumUri(Id, PageNumber);
 
             var checkResponse = await _httpClient.GetAsync(uri);
             if (checkResponse.IsSuccessStatusCode)
