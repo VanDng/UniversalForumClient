@@ -70,15 +70,17 @@ namespace UniversalForumClient.Core
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(html_source);
 
-            var forumNode = doc.DocumentNode.SelectSingleNode("//ol[@id='forums']");
-
-            var forumHrefs = forumNode.SelectNodes("//a[starts-with(@href='forums/')]" +
-                                                      "[ends-with(@href='/')");
+            var forumHrefs = doc.DocumentNode.SelectNodes("//ol[@id='forums'] " +
+                                                          "//a[starts-with(@href,'forums/') and '/' = substring(@href, string-length(@href)-string-length('/')+1)]");
 
             foreach (var forumHref in forumHrefs)
             {
-                Debug.WriteLine(forumHref.InnerText);
+                var href = forumHref.Attributes["href"].Value;
+                var forumId = href.Replace("/", "").Replace("forums", "");
+
+                forumIds.Add(forumId);
             }
+
             return forumIds.ToArray();
         }
 

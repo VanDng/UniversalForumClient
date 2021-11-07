@@ -24,6 +24,11 @@ namespace TestProject1
             _forum = new Forum(_httpClient, "99");
         }
 
+        private string TestDataPath(string relativeFilePath)
+        {
+            return Utility.SolutionPath() + @"\Test\TestData\" + relativeFilePath;
+        }
+
         [Fact]
         public async Task GetChildForums()
         {
@@ -35,7 +40,7 @@ namespace TestProject1
                 "an-choi-tiec-tung.85"
             };
 
-            var testDataFilePath = Utility.SolutionPath() + @"\SampleData\forum_html_source.html";
+            var testDataFilePath = TestDataPath("forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 

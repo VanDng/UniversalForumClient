@@ -38,7 +38,7 @@ namespace TestProject1
 
         public void SetHttpResponse(string content)
         {
-            var byteArray = Encoding.ASCII.GetBytes(content);
+            var byteArray = Encoding.UTF8.GetBytes(content);
             var byteArrayContent = new ByteArrayContent(byteArray);
 
             _httpResponseMessage.Content = byteArrayContent;

@@ -11,6 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{6FC80742-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject1", "Test\TestProject1\TestProject1.csproj", "{E2BE2162-9967-4E1C-86EB-589735DD934C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleData", "SampleData", "{BF2A7EF8-687A-43F9-8635-267851E0505B}"
+	ProjectSection(SolutionItems) = preProject
+		SampleData\forum_html_source.html = SampleData\forum_html_source.html
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

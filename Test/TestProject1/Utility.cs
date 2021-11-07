@@ -7,13 +7,11 @@ namespace TestProject1
         public static string SolutionPath()
         {
             var currentDir = System.IO.Directory.GetCurrentDirectory();
-            var solutionDir = string.Empty;
+            var solutionDir = currentDir;
             
             while(true)
             {
-                solutionDir = currentDir;
-
-                if (Path.GetFileName(solutionDir) == "UniverlForumClient")
+                if (Path.GetFileName(solutionDir) == "UniversalForumClient")
                 {
                     break;
                 }
