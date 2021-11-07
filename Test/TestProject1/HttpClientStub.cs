@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using UniversalForumClient.HttpClient;
+using UniversalForumClient.Http;
 
 namespace TestProject1
 {
@@ -31,7 +31,7 @@ namespace TestProject1
             _httpResponseMessage.StatusCode = HttpStatusCode.OK;
         }
 
-        public void SetHttpReponse(HttpStatusCode statusCode)
+        public void SetHttpResponse(HttpStatusCode statusCode)
         {
             _httpResponseMessage.StatusCode = statusCode;
         }

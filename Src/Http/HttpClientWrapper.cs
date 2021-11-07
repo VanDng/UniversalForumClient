@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 
-namespace UniversalForumClient.HttpClient
+namespace UniversalForumClient.Http
 {
     public class HttpClientWrapper : IHttpClient, IDisposable
     {
-        private System.Net.Http.HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         public Uri BaseAddress
         {
@@ -16,7 +14,6 @@ namespace UniversalForumClient.HttpClient
             {
                 return _httpClient.BaseAddress;
             }
-
             set
             {
                 _httpClient.BaseAddress = value;
@@ -25,12 +22,12 @@ namespace UniversalForumClient.HttpClient
 
         public HttpClientWrapper()
         {
-            _httpClient = new System.Net.Http.HttpClient();
+            _httpClient = new HttpClient();
         }
 
         public void Dispose()
         {
-            _httpClient?.Dispose();
+            _httpClient.Dispose();
         }
 
         public Task<HttpResponseMessage> GetAsync(string uri)
@@ -38,9 +35,9 @@ namespace UniversalForumClient.HttpClient
             return _httpClient.GetAsync(uri);
         }
 
-        public Task<HttpResponseMessage> PostAsync(string uri, HttpContent content)
+        public Task<HttpResponseMessage> PostAsync(string requestUri, HttpContent content)
         {
-            return _httpClient.PostAsync(uri, content);
+            return _httpClient.PostAsync(requestUri, content);
         }
     }
 }

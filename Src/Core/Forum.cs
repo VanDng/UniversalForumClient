@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using UniversalForumClient.HttpClient;
+using HtmlAgilityPack;
+using UniversalForumClient.Http;
 
 namespace UniversalForumClient.Core
 {
@@ -65,8 +67,18 @@ namespace UniversalForumClient.Core
         {
             List<string> forumIds = new List<string>();
 
-            // TODO
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(html_source);
 
+            var forumNode = doc.DocumentNode.SelectSingleNode("//ol[@id='forums']");
+
+            var forumHrefs = forumNode.SelectNodes("//a[starts-with(@href='forums/')]" +
+                                                      "[ends-with(@href='/')");
+
+            foreach (var forumHref in forumHrefs)
+            {
+                Debug.WriteLine(forumHref.InnerText);
+            }
             return forumIds.ToArray();
         }
 

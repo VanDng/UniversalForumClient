@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace UniversalForumClient.HttpClient
+namespace UniversalForumClient.Http
 {
     public interface IHttpClient : IDisposable
     {
