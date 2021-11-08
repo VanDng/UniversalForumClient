@@ -23,23 +23,32 @@ namespace UniversalForumClient.Core
             return new Thread(_httpClient, Id, pageNumber);
         }
 
-        public async Task<Post[]> GetPosts()
+        public async Task<List<Post>> GetPosts()
         {
             List<Post> posts = new List<Post>();
 
-            var html_source = await GetHtmlSource();
+            var htmlSource = await GetHtmlSource();
 
             HtmlDocument htmlDocument = new HtmlDocument();
-            htmlDocument.LoadHtml(html_source);
-            var postList = htmlDocument.GetElementbyId("//messageList");
+            htmlDocument.LoadHtml(htmlSource);
 
-            foreach(var postItem in postList.ChildNodes)
+            var messageList = htmlDocument.DocumentNode.SelectNodes("//ol[@id='messageList']//li");
+
+            foreach(var messageNode in messageList)
             {
-                Post post = Post.ParseFromHtml(postItem.InnerHtml);
+                var author = messageNode.Attributes["data-author"].Value;
+
+                var messageTextNode = messageNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
+
+                var contentNodes = messageTextNode.ChildNodes
+                                                  .Where(w => !(w.Name == "div" && w.Attributes["class"].Value == "messageTextEndMarker") &&
+                                                              !(w.Name == "br"));
+                Post post = new Post(author, contentNodes.ToArray());
+  
                 posts.Add(post);
             }
-            
-            return posts.ToArray();
+
+            return posts;
         }
     }
 }

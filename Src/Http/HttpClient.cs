@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection.Metadata;
+using System.Text;
 using System.Threading.Tasks;
 using MSHttpClient = System.Net.Http.HttpClient;
 
@@ -47,9 +49,9 @@ namespace UniversalForumClient.Http
             _httpClient?.Dispose();
         }
 
-        public async Task<HttpResponseMessage> GetAsync(string uri)
+        public Task<HttpResponseMessage> GetAsync(string uri)
         {
-            return await _httpClient.GetAsync(uri);
+            return ResponseFilter(_httpClient.GetAsync(uri));
             
             // if (RequestControl)
             // {
@@ -86,7 +88,27 @@ namespace UniversalForumClient.Http
 
         public Task<HttpResponseMessage> PostAsync(string uri, HttpContent content)
         {
-            return _httpClient.PostAsync(uri, content);
+            return ResponseFilter(_httpClient.PostAsync(uri, content));
+        }
+
+        private Task<HttpResponseMessage> ResponseFilter(Task<HttpResponseMessage> responseTask)
+        {
+            var task = Task.Run(async () =>
+            {
+                var orgResponseMessage = await responseTask;
+
+                var orgResponseContent = await orgResponseMessage.Content.ReadAsStringAsync();
+
+                var newResponseContent = HtmlHelper.RemoveInsignificantHtmlWhiteSpace(orgResponseContent);
+
+                var byteArray = Encoding.UTF8.GetBytes(newResponseContent);
+                var byteArrayContent = new ByteArrayContent(byteArray);
+                orgResponseMessage.Content = byteArrayContent;
+
+                return orgResponseMessage;
+            });
+
+            return task;
         }
     }
 }
