@@ -11,9 +11,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{6FC80742-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject1", "Test\TestProject1\TestProject1.csproj", "{E2BE2162-9967-4E1C-86EB-589735DD934C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleData", "SampleData", "{BF2A7EF8-687A-43F9-8635-267851E0505B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestData", "TestData", "{25295FA9-FD90-4584-88E6-ED4B1C055899}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gvn", "Gvn", "{209FA825-3623-4B16-9927-5213A03E4A38}"
 	ProjectSection(SolutionItems) = preProject
-		SampleData\forum_html_source.html = SampleData\forum_html_source.html
+		Test\TestData\Gvn\forum_html_source.html = Test\TestData\Gvn\forum_html_source.html
+		Test\TestData\Gvn\thread_html_source.html = Test\TestData\Gvn\thread_html_source.html
 	EndProjectSection
 EndProject
 Global
@@ -37,6 +40,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C4E641B0-4E3A-41AC-994D-C6277E09E929} = {DD776FC2-0A58-473A-9089-36C659093473}
 		{E2BE2162-9967-4E1C-86EB-589735DD934C} = {6FC80742-F20B-4A1B-90F3-B161A70589BF}
+		{25295FA9-FD90-4584-88E6-ED4B1C055899} = {6FC80742-F20B-4A1B-90F3-B161A70589BF}
+		{209FA825-3623-4B16-9927-5213A03E4A38} = {25295FA9-FD90-4584-88E6-ED4B1C055899}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3F467D35-CB88-474E-8B76-08752E951161}

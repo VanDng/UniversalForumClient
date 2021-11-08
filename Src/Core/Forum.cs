@@ -10,29 +10,18 @@ using UniversalForumClient.Http;
 
 namespace UniversalForumClient.Core
 {
-    public class Forum
+    public class Forum : BasePage
     {
-        private IHttpClient _httpClient;
-
-        // An ID can be "some-thing-special.99" or just "99",
-        // it's only SEO matter, here we don't need to care about it
-        public string Id { get; private set; }
-
-        public int PageNumber { get; private set; }
-
         public Forum(IHttpClient httpClient, string forumId, int pageNumber = 1)
+            : base(BasePage.PageTypes.Forum, httpClient, forumId, pageNumber)
         {
-            _httpClient = httpClient;
-            
-            Id = forumId;
-            PageNumber = pageNumber;
         }
 
         public async Task<Forum[]> GetChildForums()
         {
             List<Forum> forums = new List<Forum>();
 
-            var htmlSourcce = await FetchHtmlSource();
+            var htmlSourcce = await GetHtmlSource();
 
             string[] forumIds = ExtractChildForumIds(htmlSourcce);
 
@@ -44,22 +33,7 @@ namespace UniversalForumClient.Core
             return forums.ToArray();
         }
 
-        public async Task<int> GetTotalPage()
-        {
-            var htmlSourcce = await FetchHtmlSource();
-
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(htmlSourcce);
-
-            var nav = doc.DocumentNode.SelectSingleNode("//div[@class='PageNav']");
-
-            var totalPage = -1;
-            int.TryParse(nav.Attributes["data-last"].Value, out totalPage);
-
-            return totalPage;
-        }
-
-        public Forum GoToPage(int pageNumber)
+        public Forum GotoPage(int pageNumber)
         {
             return new Forum(_httpClient, this.Id, pageNumber);
         }
@@ -68,7 +42,7 @@ namespace UniversalForumClient.Core
         {
             List<Thread> threads = new List<Thread>();
 
-            var html_sourcce = await FetchHtmlSource();
+            var html_sourcce = await GetHtmlSource();
 
             string[] threadIds = ExtractThreadIds(html_sourcce);
 
@@ -121,21 +95,6 @@ namespace UniversalForumClient.Core
             threadIds = threadIds.Distinct().ToList();
 
             return threadIds.ToArray();
-        }
-
-        private async Task<string> FetchHtmlSource()
-        {
-            string htmlSource = string.Empty;
-
-            string uri = UriManager.ForumUri(Id, PageNumber);
-
-            var checkResponse = await _httpClient.GetAsync(uri);
-            if (checkResponse.IsSuccessStatusCode)
-            {
-                htmlSource = await checkResponse.Content.ReadAsStringAsync();
-            }
-
-            return htmlSource;
         }
     }
 }

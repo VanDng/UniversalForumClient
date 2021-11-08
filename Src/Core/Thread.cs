@@ -11,34 +11,23 @@ using UniversalForumClient.Http;
 
 namespace UniversalForumClient.Core
 {
-    public class Thread
+    public class Thread : BasePage
     {
-        private IHttpClient _httpClient;
-
-        public string Id { get; private set; }
-
-        public Thread(IHttpClient httpClient, string threadId)
+        public Thread(IHttpClient httpClient, string threadId, int pageNumber = 1)
+            : base(BasePage.PageTypes.Thread, httpClient, threadId, pageNumber)
         {
-            _httpClient = httpClient;
-            Id = threadId;
         }
 
-        public async Task<int> GetTotalPage()
+        public Thread GotoPage(int pageNumber)
         {
-            int totalPage = 0;
-
-            var html_source = await FetchHtmlSource(1);
-
-            // TODO
-
-            return totalPage;
+            return new Thread(_httpClient, Id, pageNumber);
         }
 
-        public async Task<Post[]> GetPosts(int pageIndex)
+        public async Task<Post[]> GetPosts()
         {
             List<Post> posts = new List<Post>();
 
-            var html_source = await FetchHtmlSource(pageIndex);
+            var html_source = await GetHtmlSource();
 
             HtmlDocument htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(html_source);
@@ -51,21 +40,6 @@ namespace UniversalForumClient.Core
             }
             
             return posts.ToArray();
-        }
-
-        private async Task<string> FetchHtmlSource(int pageIndex)
-        {
-            string html_source = string.Empty;
-
-            string uri = string.Format("threads/{0}/page-{1}", Id, pageIndex);
-
-            var checkResponse = await _httpClient.GetAsync(uri);
-            if (checkResponse.IsSuccessStatusCode)
-            {
-                html_source = await checkResponse.Content.ReadAsStringAsync();
-            }
-
-            return html_source;
         }
     }
 }
