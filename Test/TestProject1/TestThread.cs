@@ -75,6 +75,9 @@ namespace TestProject1
             };
             var authors = posts.Select(s => s.Author);
             Assert.All(expectedAuthors, a => Assert.Contains(a, authors));
+
+            // Post content
+
         }
     }
 }

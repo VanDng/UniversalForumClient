@@ -37,8 +37,6 @@ namespace UniversalForumClient.Core
             foreach(var messageNode in messageList)
             {
                 Post post = ParsePost(messageNode, true);
-
-
                 posts.Add(post);
             }
 
@@ -65,7 +63,6 @@ namespace UniversalForumClient.Core
 
             var contents = new List<object>();
 
-            //contentNodes = contentNodes.Reverse();
             foreach (var contentNode in contentNodes)
             {
                 object content = null;
