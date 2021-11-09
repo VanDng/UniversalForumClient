@@ -58,8 +58,7 @@ namespace UniversalForumClient.Core
             }
 
             var contentNodes = messageTextNode.ChildNodes
-                                                  .Where(w => !(w.Name == "div" && w.Attributes["class"].Value == "messageTextEndMarker") &&
-                                                              !(w.Name == "br"));
+                                                  .Where(w => !(w.Name == "div" && w.Attributes["class"].Value == "messageTextEndMarker"));
 
             var contents = new List<object>();
 
@@ -74,6 +73,10 @@ namespace UniversalForumClient.Core
                 else if (contentNode.Name == "img")
                 {
                     content = new Image(contentNode.Attributes["src"].Value);
+                }
+                else if (contentNode.Name == "br")
+                {
+                    content = new Break();
                 }
                 else
                 {
