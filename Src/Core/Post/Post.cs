@@ -11,11 +11,12 @@ namespace UniversalForumClient.Core
     {
         public string Author { get; private set; }
 
-        public ContentManager Content { get; private set; }
+        public object[] Contents { get; private set; }
 
-        public Post(string author)
+        public Post(string author, IEnumerable<object> contents)
         {
             Author = author;
+            Contents = contents.ToArray();
         }
     }
 }

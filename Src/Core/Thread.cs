@@ -36,19 +36,59 @@ namespace UniversalForumClient.Core
 
             foreach(var messageNode in messageList)
             {
-                var author = messageNode.Attributes["data-author"].Value;
+                Post post = ParsePost(messageNode, true);
 
-                var messageTextNode = messageNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
 
-                var contentNodes = messageTextNode.ChildNodes
-                                                  .Where(w => !(w.Name == "div" && w.Attributes["class"].Value == "messageTextEndMarker") &&
-                                                              !(w.Name == "br"));
-                Post post = new Post(author, contentNodes.ToArray());
-  
                 posts.Add(post);
             }
 
             return posts;
+        }
+
+        private Post ParsePost(HtmlNode messageNode, bool isRootPost = false)
+        {
+            var author = messageNode.Attributes["data-author"].Value;
+
+            HtmlNode messageTextNode = null;
+            if (isRootPost)
+            {
+                messageTextNode = messageNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");               
+            }
+            else
+            {
+                messageTextNode = messageNode.SelectSingleNode(".//div[contains(@class,'quote')]");
+            }
+
+            var contentNodes = messageTextNode.ChildNodes
+                                                  .Where(w => !(w.Name == "div" && w.Attributes["class"].Value == "messageTextEndMarker") &&
+                                                              !(w.Name == "br"));
+
+            var contents = new List<object>();
+
+            //contentNodes = contentNodes.Reverse();
+            foreach (var contentNode in contentNodes)
+            {
+                object content = null;
+
+                if (contentNode.Name == "div" && contentNode.Attributes.Contains("data-author"))
+                {
+                    content = ParsePost(contentNode);
+                }
+                else if (contentNode.Name == "img")
+                {
+                    content = new Image(contentNode.Attributes["src"].Value);
+                }
+                else
+                {
+                    content = new Text(contentNode.InnerText, contentNode.OuterHtml);
+                }
+
+                contents.Add(content);
+            }
+
+            Post post = new Post(author, contents.ToArray());
+
+            return post;
         }
     }
 }
