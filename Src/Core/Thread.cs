@@ -86,9 +86,116 @@ namespace UniversalForumClient.Core
                 contents.Add(content);
             }
 
+            var textCombinedContents = CombineTextContent(contents);
+
+            var spaceFilteredContents = FilterUnnecessarySpace(textCombinedContents);
+
+            contents = spaceFilteredContents;
+
             Post post = new Post(author, contents.ToArray());
 
             return post;
+        }
+
+        private List<object> CombineTextContent(IEnumerable<object> contents)
+        {
+            var newContents = new List<object>();
+
+            var textContents = new List<Text>();
+
+            for(int idx = 0; idx < contents.Count(); idx++)
+            {
+                var content = contents.ElementAt(idx);
+                var isTextContent = content as Text == null ? false : true;
+
+                if (isTextContent)
+                {
+                    textContents.Add((Text)content);
+                }
+                
+                if (idx == contents.Count() -1 ||
+                    isTextContent == false)
+                {
+                    if (textContents.Count > 0)
+                    {
+                        var plainText = string.Join("", textContents.Select(s => s.PlainText));
+                        var markupText = string.Join("", textContents.Select(s => s.MarkupText));
+
+                        var newText = new Text(plainText, markupText);
+
+                        newContents.Add(newText);
+
+                        textContents.Clear();
+                    }
+                }
+
+                if (isTextContent == false)
+                {
+                    newContents.Add(content);
+                }
+            }
+
+            return newContents;
+        }
+
+        private List<object> FilterUnnecessarySpace(IEnumerable<object> contents)
+        {
+            var newContents = new List<object>();
+
+            foreach(var content in contents)
+            {
+                if (content is Text)
+                {
+                    var textContent = content as Text;
+                    StringBuilder sb = new StringBuilder();
+
+                    var newPlainText = textContent.PlainText;
+                    var newMarkupText = textContent.MarkupText;
+
+                    // Start with
+                    if (newMarkupText.StartsWith("\n"))
+                    {
+                        sb.Append("\n");
+                    }
+                    do
+                    {
+                        sb.Append("\t");
+                    } while (newMarkupText.StartsWith(sb.ToString()));
+                    sb.Remove(sb.Length - 1, 1);
+
+                    newPlainText = newPlainText.Remove(0, sb.Length);
+                    newMarkupText = newMarkupText.Remove(0, sb.Length);
+
+                    // End with
+                    sb.Clear();
+                    do
+                    {
+                        sb.Append("\t");
+                    } while (newMarkupText.EndsWith(sb.ToString()));
+                    sb.Remove(sb.Length - 1, 1);
+
+                    sb.Insert(0, "\n");
+                    if (newMarkupText.EndsWith(sb.ToString()) == false)
+                    {
+                        sb.Remove(0, 1);
+                    }
+
+                    if (sb.Length > 0)
+                    {
+                        newPlainText = newPlainText.Remove(newPlainText.Length - sb.Length);
+                        newMarkupText = newMarkupText.Remove(newMarkupText.Length - sb.Length);
+                    }
+
+                    var newTextContent = new Text(newPlainText, newMarkupText);
+                    newContents.Add(newTextContent);
+                }
+                else
+                {
+                    newContents.Add(content);
+                }
+            }
+
+            return newContents;
         }
     }
 }

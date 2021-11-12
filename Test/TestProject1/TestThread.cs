@@ -37,8 +37,6 @@ namespace TestProject1
         [Fact]
         public async void GetPosts()
         {
-            
-
             var testDataFilePath = TestDataPath("thread_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
@@ -77,7 +75,20 @@ namespace TestProject1
             Assert.All(expectedAuthors, a => Assert.Contains(a, authors));
 
             // Post content
+            // 1st post
+            object[] expectedContents1st = new object[]
+            {
+                "https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/253959364_411483480532566_4715033918823503796_n.jpg?_nc_cat=110&amp;ccb=1-5&amp;_nc_sid=825194&amp;_nc_ohc=ohkQ0vBA3YAAX94_o5A&amp;_nc_ht=scontent.fsgn5-10.fna&amp;oh=81468ea52407d06fc566d8d401ae39c9&amp;oe=61AC97D5",
+                "\"                  chi la de\"test\"ma              thoi              \""
+            };
+            var contents1st = posts.First().Contents;
+            var content1st = contents1st.First() as Image;
+            Assert.NotNull(content1st);
+            Assert.Equal(expectedContents1st.First().ToString(), content1st.Url);
 
+            var content2nd = contents1st.Last() as Text;
+            Assert.NotNull(content2nd);
+            Assert.Equal(expectedContents1st.Last().ToString(), content2nd.PlainText);
         }
     }
 }
