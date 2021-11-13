@@ -90,5 +90,33 @@ namespace TestProject1
             Assert.NotNull(content2nd);
             Assert.Equal(expectedContents1st.Last().ToString(), content2nd.PlainText);
         }
+
+        [Fact]
+        public async void GetPosts_Spoiler()
+        {
+            var testDataFilePath = TestDataPath("thread_spoiler_html_source.html");
+            var html_sourcce = File.ReadAllText(testDataFilePath);
+            _httpClientStub.SetHttpResponse(html_sourcce);
+
+            var posts = await _thread.GetPosts();
+
+            // Post count
+            int expectedPostCount = 20;
+            Assert.Equal(posts.Count, expectedPostCount);
+
+            // Post content
+            // 1st post
+            object[] expectedContents1st = new object[]
+            {
+                "http://gamevn.com/data/attachments/278/278049-8acb73f2f0067d4d343c8e392b94d921.jpg",
+                "\"                  chi la de\"test\"ma              thoi              \""
+            };
+            var contents1st = posts.First().Contents;
+            var sploier1st = contents1st.First() as Sploiler;
+            Assert.NotNull(sploier1st);
+            var image1st = sploier1st.Contents.First() as Image;
+            Assert.NotNull(image1st);
+            Assert.Equal(expectedContents1st.First().ToString(), image1st.Url);
+        }
     }
 }

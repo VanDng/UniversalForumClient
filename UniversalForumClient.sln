@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gvn", "Gvn", "{209FA825-362
 	ProjectSection(SolutionItems) = preProject
 		Test\TestData\Gvn\forum_html_source.html = Test\TestData\Gvn\forum_html_source.html
 		Test\TestData\Gvn\thread_html_source.html = Test\TestData\Gvn\thread_html_source.html
+		Test\TestData\Gvn\thread_spoiler_html_source.html = Test\TestData\Gvn\thread_spoiler_html_source.html
 	EndProjectSection
 EndProject
 Global

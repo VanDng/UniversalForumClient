@@ -36,52 +36,37 @@ namespace UniversalForumClient.Core
 
             foreach(var messageNode in messageList)
             {
-                Post post = ParsePost(messageNode, true);
+                Post post = ParsePost(messageNode, isRootNode: true);
                 posts.Add(post);
             }
 
             return posts;
         }
 
-        private Post ParsePost(HtmlNode messageNode, bool isRootPost = false)
+        private Post ParsePost(HtmlNode messageNode, bool isRootNode = false)
         {
             var author = messageNode.Attributes["data-author"].Value;
 
             HtmlNode messageTextNode = null;
-            if (isRootPost)
+            if (isRootNode)
             {
                 messageTextNode = messageNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");               
             }
             else
             {
-                messageTextNode = messageNode.SelectSingleNode(".//div[contains(@class,'quote')]");
+                 messageTextNode = messageNode.SelectSingleNode(".//div[contains(@class,'quote')]");
             }
 
             var contentNodes = messageTextNode.ChildNodes
-                                                  .Where(w => !(w.Name == "div" && w.Attributes["class"].Value == "messageTextEndMarker"));
+                                                  .Where(w => !(w.Name == "div" &&
+                                                                w.Attributes.Contains("class") &&
+                                                                w.Attributes["class"].Value == "messageTextEndMarker"));
 
             var contents = new List<object>();
 
             foreach (var contentNode in contentNodes)
             {
-                object content = null;
-
-                if (contentNode.Name == "div" && contentNode.Attributes.Contains("data-author"))
-                {
-                    content = ParsePost(contentNode);
-                }
-                else if (contentNode.Name == "img")
-                {
-                    content = new Image(contentNode.Attributes["src"].Value);
-                }
-                else if (contentNode.Name == "br")
-                {
-                    content = new Break();
-                }
-                else
-                {
-                    content = new Text(contentNode.InnerText, contentNode.OuterHtml);
-                }
+                var content = ParseContent(contentNode);
 
                 contents.Add(content);
             }
@@ -95,6 +80,50 @@ namespace UniversalForumClient.Core
             Post post = new Post(author, contents.ToArray());
 
             return post;
+        }
+
+        private Sploiler ParseSpoiler(HtmlNode spoilerNote)
+        {
+            var contentNodes = spoilerNote.ChildNodes;
+
+            var contents = new List<object>();
+
+            foreach(var contentNode in contentNodes)
+            {
+                var content = ParseContent(contentNode);
+                contents.Add(content);
+            }
+
+            return new Sploiler(contents.ToArray());
+        }
+
+        private object ParseContent(HtmlNode contentNode)
+        {
+            object content = null;
+
+            if (contentNode.Name == "div" && contentNode.Attributes.Contains("data-author"))
+            {
+                content = ParsePost(contentNode);
+            }
+            else if (contentNode.Name == "div" && contentNode.Attributes.Contains("class") && contentNode.Attributes["class"].Value.Contains("bbCodeSpoilerContainer"))
+            {
+                var spoilerNode = contentNode.SelectSingleNode(".//div[contains(@class,'bbCodeSpoilerText')]");
+                content = ParseSpoiler(spoilerNode);
+            }
+            else if (contentNode.Name == "img")
+            {
+                content = new Image(contentNode.Attributes["src"].Value);
+            }
+            else if (contentNode.Name == "br")
+            {
+                content = new Break();
+            }
+            else
+            {
+                content = new Text(contentNode.InnerText, contentNode.OuterHtml);
+            }
+
+            return content;
         }
 
         private List<object> CombineTextContent(IEnumerable<object> contents)
