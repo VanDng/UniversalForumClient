@@ -88,13 +88,30 @@ namespace UniversalForumClient.Core
 
             var contents = new List<object>();
 
-            foreach(var contentNode in contentNodes)
+            foreach (var contentNode in contentNodes)
             {
                 var content = ParseContent(contentNode);
                 contents.Add(content);
             }
 
             return new Sploiler(contents.ToArray());
+        }
+
+        private Hyperlink ParseHyperlink(HtmlNode spoilerNote)
+        {
+            var contentNodes = spoilerNote.ChildNodes;
+
+            var contents = new List<object>();
+
+            foreach (var contentNode in contentNodes)
+            {
+                var content = ParseContent(contentNode);
+                contents.Add(content);
+            }
+
+            string href = spoilerNote.Attributes["href"].Value;
+
+            return new Hyperlink(href, contents.ToArray());
         }
 
         private object ParseContent(HtmlNode contentNode)
@@ -118,9 +135,18 @@ namespace UniversalForumClient.Core
             {
                 content = new Break();
             }
-            else
+            else if (contentNode.Name == "a")
+            {
+                content = ParseHyperlink(contentNode);
+            }
+            else if (contentNode.Name == "#text" ||
+                     (contentNode.Name == "div" && contentNode.Attributes.Contains("class") == false && contentNode.Attributes.Contains("style")))
             {
                 content = new Text(contentNode.InnerText, contentNode.OuterHtml);
+            }
+            else
+            {
+                content = new Undefined(contentNode.OuterHtml);
             }
 
             return content;
