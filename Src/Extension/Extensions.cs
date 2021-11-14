@@ -4,10 +4,11 @@ using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using UniversalForumClient.Core;
 
 namespace UniversalForumClient.Extension
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         public static string Serialize(this IEnumerable<object> objects)
         {
@@ -60,6 +61,53 @@ namespace UniversalForumClient.Extension
             }
 
             return expando;
+        }
+    }
+
+    public static partial class Extensions
+    {
+        public static Image[] LookupImages(this object post, bool isRecur = true)
+        {
+            return LookupImages(new object[] { post }, isRecur: isRecur);
+        }
+
+        public static Image[] LookupImages(this IEnumerable<object> contents, bool isRecur = true)
+        {
+            var images = new List<Image>();
+
+            foreach(var content in contents)
+            {
+                if (content is Image)
+                {
+                    images.Add(content as Image);
+                }
+                else
+                {
+                    if (isRecur == false)
+                    {
+                        continue;
+                    }
+
+                    var pros = content.GetType().GetProperties();
+                    var proContents = pros.Where(w => w.Name == "Contents");
+
+                    if (proContents.Count() > 0)
+                    {
+                        var proContent = proContents.First();
+                        var proContentValue = proContent.GetValue(content);
+
+                        var enumContent = proContentValue as IEnumerable<object>;
+
+                        if (enumContent != null)
+                        {
+                            var childImages = enumContent.LookupImages();
+                            images.AddRange(childImages);
+                        }
+                    }
+                }
+            }
+
+            return images.ToArray();
         }
     }
 }

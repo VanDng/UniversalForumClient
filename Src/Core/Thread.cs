@@ -118,7 +118,8 @@ namespace UniversalForumClient.Core
                 var childContents = ParseContents(contentNode);
                 content = new Hyperlink(href, childContents);
             }
-            else if (contentNode.Name == "#text")
+            else if (contentNode.Name == "#text" ||
+                     contentNode.Name == "b")
             {
                 content = new Text(contentNode.InnerText, contentNode.OuterHtml);
             }

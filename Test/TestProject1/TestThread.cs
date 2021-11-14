@@ -45,7 +45,7 @@ namespace TestProject1
                 Directory.CreateDirectory(dir);
             }
 
-            string jsonString = posts.Cast<object>().Serialize();
+            string jsonString = posts.Serialize();
 
             //JsonSerializerOptions jso = new JsonSerializerOptions();
             //jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
@@ -129,19 +129,16 @@ namespace TestProject1
 
             // Post content
             // 1st post
-            object[] expectedContents1st = new object[]
-            {
-                "http://gamevn.com/data/attachments/278/278049-8acb73f2f0067d4d343c8e392b94d921.jpg",
-                "\"                  chi la de\"test\"ma              thoi              \""
-            };
+            string expectedImage1st = "data/attachments/278/278049-8acb73f2f0067d4d343c8e392b94d921.jpg";
             var contents1st = posts.First().Contents;
-            var sploier1st = contents1st.First() as Spoiler;
-            Assert.NotNull(sploier1st);
-            var image1st = sploier1st.Contents.First() as Image;
-            //Assert.NotNull(image1st);
-            //Assert.Equal(expectedContents1st.First().ToString(), image1st.Url);
+            var img1st = (((contents1st.First() as Spoiler).Contents.First() as Hyperlink).Contents.First() as Image).Source;
+            Assert.Equal(expectedImage1st, img1st);
 
-            SerializePosts(posts);
+            // last post
+            string expectedImageLast = "data/attachments/278/278654-771dc7f070c930bd54fb7541ad8b6b65.jpg";
+            var contentsLast = posts.Last().Contents;
+            var imgLast = (((contentsLast.Last() as Spoiler).Contents.Last() as Hyperlink).Contents.Last() as Image).Source;
+            Assert.Equal(expectedImageLast, imgLast);
         }
     }
 }
