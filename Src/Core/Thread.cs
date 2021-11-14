@@ -36,82 +36,48 @@ namespace UniversalForumClient.Core
 
             foreach(var messageNode in messageList)
             {
-                Post post = ParsePost(messageNode, isRootNode: true);
+                var post = ParsePost(messageNode);
+
                 posts.Add(post);
             }
 
             return posts;
         }
 
-        private Post ParsePost(HtmlNode messageNode, bool isRootNode = false)
+        private Post ParsePost(HtmlNode rootNode)
         {
-            var author = messageNode.Attributes["data-author"].Value;
+            var messageTextNode = rootNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
 
-            HtmlNode messageTextNode = null;
-            if (isRootNode)
-            {
-                messageTextNode = messageNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");               
-            }
-            else
-            {
-                 messageTextNode = messageNode.SelectSingleNode(".//div[contains(@class,'quote')]");
-            }
+            var author = rootNode.Attributes["data-author"].Value;
+            var contents = ParseContents(messageTextNode);
 
-            var contentNodes = messageTextNode.ChildNodes
+            Post post = new Post(author, contents);
+
+            return post;
+        }
+
+        private object[] ParseContents(HtmlNode messageNode)
+        {
+            var contentNodes = messageNode.ChildNodes
                                                   .Where(w => !(w.Name == "div" &&
                                                                 w.Attributes.Contains("class") &&
                                                                 w.Attributes["class"].Value == "messageTextEndMarker"));
 
             var contents = new List<object>();
 
-            foreach (var contentNode in contentNodes)
-            {
-                var content = ParseContent(contentNode);
-
-                contents.Add(content);
-            }
-
-            var textCombinedContents = CombineTextContent(contents);
-
-            var spaceFilteredContents = FilterUnnecessarySpace(textCombinedContents);
-
-            contents = spaceFilteredContents;
-
-            Post post = new Post(author, contents.ToArray());
-
-            return post;
-        }
-
-        private Sploiler ParseSpoiler(HtmlNode spoilerNote)
-        {
-            var contentNodes = spoilerNote.ChildNodes;
-
-            var contents = new List<object>();
-
-            foreach (var contentNode in contentNodes)
+            foreach(var contentNode in contentNodes)
             {
                 var content = ParseContent(contentNode);
                 contents.Add(content);
             }
 
-            return new Sploiler(contents.ToArray());
-        }
+            contents = FilterUnnecessaryContent(contents);
 
-        private Hyperlink ParseHyperlink(HtmlNode spoilerNote)
-        {
-            var contentNodes = spoilerNote.ChildNodes;
+            contents = CombineTextContent(contents);
 
-            var contents = new List<object>();
+            contents = FilterUnnecessarySpace(contents);
 
-            foreach (var contentNode in contentNodes)
-            {
-                var content = ParseContent(contentNode);
-                contents.Add(content);
-            }
-
-            string href = spoilerNote.Attributes["href"].Value;
-
-            return new Hyperlink(href, contents.ToArray());
+            return contents.ToArray();
         }
 
         private object ParseContent(HtmlNode contentNode)
@@ -120,12 +86,14 @@ namespace UniversalForumClient.Core
 
             if (contentNode.Name == "div" && contentNode.Attributes.Contains("data-author"))
             {
-                content = ParsePost(contentNode);
+                var messageTextNode = contentNode.SelectSingleNode(".//div[contains(@class,'quote')]");
+                content = ParseContents(messageTextNode);
             }
             else if (contentNode.Name == "div" && contentNode.Attributes.Contains("class") && contentNode.Attributes["class"].Value.Contains("bbCodeSpoilerContainer"))
             {
                 var spoilerNode = contentNode.SelectSingleNode(".//div[contains(@class,'bbCodeSpoilerText')]");
-                content = ParseSpoiler(spoilerNode);
+                var childContents = ParseContents(spoilerNode);
+                content = new Spoiler(childContents);
             }
             else if (contentNode.Name == "img")
             {
@@ -137,12 +105,19 @@ namespace UniversalForumClient.Core
             }
             else if (contentNode.Name == "a")
             {
-                content = ParseHyperlink(contentNode);
+                var href = contentNode.Attributes["href"].Value;
+                var childContents = ParseContents(contentNode);
+                content = new Hyperlink(href, childContents);
             }
-            else if (contentNode.Name == "#text" ||
-                     (contentNode.Name == "div" && contentNode.Attributes.Contains("class") == false && contentNode.Attributes.Contains("style")))
+            else if (contentNode.Name == "#text")
             {
                 content = new Text(contentNode.InnerText, contentNode.OuterHtml);
+            }
+            else if (contentNode.Name == "div" && contentNode.Attributes.Contains("class") == false && contentNode.Attributes.Contains("style"))
+            {
+                var style = contentNode.Attributes["style"].Value;
+                var childContents = ParseContents(contentNode);
+                content = new StyleContainer(style, childContents);
             }
             else
             {
@@ -208,37 +183,58 @@ namespace UniversalForumClient.Core
                     var newMarkupText = textContent.MarkupText;
 
                     // Start with
-                    if (newMarkupText.StartsWith("\n"))
+                    while (true)
                     {
-                        sb.Append("\n");
-                    }
-                    do
-                    {
-                        sb.Append("\t");
-                    } while (newMarkupText.StartsWith(sb.ToString()));
-                    sb.Remove(sb.Length - 1, 1);
+                        int preLength = newPlainText.Length;
 
-                    newPlainText = newPlainText.Remove(0, sb.Length);
-                    newMarkupText = newMarkupText.Remove(0, sb.Length);
+                        sb.Clear();
+                        if (newMarkupText.StartsWith("\n"))
+                        {
+                            sb.Append("\n");
+                        }
+                        do
+                        {
+                            sb.Append("\t");
+                        } while (newMarkupText.StartsWith(sb.ToString()));
+                        sb.Remove(sb.Length - 1, 1);
+
+                        newPlainText = newPlainText.Remove(0, sb.Length);
+                        newMarkupText = newMarkupText.Remove(0, sb.Length);
+
+                        if (newPlainText.Length == preLength)
+                        {
+                            break;
+                        }
+                    }
 
                     // End with
-                    sb.Clear();
-                    do
+                    while (true)
                     {
-                        sb.Append("\t");
-                    } while (newMarkupText.EndsWith(sb.ToString()));
-                    sb.Remove(sb.Length - 1, 1);
+                        int preLength = newPlainText.Length;
 
-                    sb.Insert(0, "\n");
-                    if (newMarkupText.EndsWith(sb.ToString()) == false)
-                    {
-                        sb.Remove(0, 1);
-                    }
+                        sb.Clear();
+                        do
+                        {
+                            sb.Append("\t");
+                        } while (newMarkupText.EndsWith(sb.ToString()));
+                        sb.Remove(sb.Length - 1, 1);
 
-                    if (sb.Length > 0)
-                    {
-                        newPlainText = newPlainText.Remove(newPlainText.Length - sb.Length);
-                        newMarkupText = newMarkupText.Remove(newMarkupText.Length - sb.Length);
+                        sb.Insert(0, "\n");
+                        if (newMarkupText.EndsWith(sb.ToString()) == false)
+                        {
+                            sb.Remove(0, 1);
+                        }
+
+                        if (sb.Length > 0)
+                        {
+                            newPlainText = newPlainText.Remove(newPlainText.Length - sb.Length);
+                            newMarkupText = newMarkupText.Remove(newMarkupText.Length - sb.Length);
+                        }
+
+                        if (newPlainText.Length == preLength)
+                        {
+                            break;
+                        }
                     }
 
                     var newTextContent = new Text(newPlainText, newMarkupText);
@@ -251,6 +247,28 @@ namespace UniversalForumClient.Core
             }
 
             return newContents;
+        }
+
+        private List<object> FilterUnnecessaryContent(IEnumerable<object> contents)
+        {
+            var newObjects = new List<object>();
+
+            foreach(var content in contents)
+            {
+                if (content is Text)
+                {
+                    var textContent = content as Text;
+
+                    if (textContent.PlainText == "&#8203;")
+                    {
+                        continue;
+                    }
+                }
+                 
+                newObjects.Add(content);
+            }
+
+            return newObjects;
         }
     }
 }

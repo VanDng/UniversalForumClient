@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 
 namespace UniversalForumClient.Core
 {
-    public class Sploiler
+    public class StyleContainer
     {
+        public string Style { get; private set; }
+
         public object[] Contents { get; private set; }
 
-        public Sploiler(object[] contents)
+        public StyleContainer(string style, object[] contents)
         {
+            Style = style;
             Contents = contents;
         }
     }
