@@ -13,7 +13,10 @@ namespace UniversalForumClient.Extension
         {
             var newObjects = objects.Select(s => CreateExpandObject(s));
 
-            var jsonString = JsonSerializer.Serialize(newObjects);
+            JsonSerializerOptions jso = new JsonSerializerOptions();
+            jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+
+            var jsonString = JsonSerializer.Serialize(newObjects, jso);
 
             return jsonString;
         }
@@ -36,7 +39,24 @@ namespace UniversalForumClient.Extension
 
             foreach (var property in target.GetType().GetProperties())
             {
-                dictionary.Add(property.Name, property.GetValue(target));
+                if (property.Name == "Contents")
+                {
+                    var objContents = property.GetValue(target);
+                    var contents = objContents as object[];
+
+                    var newContents = new List<object>();
+                    foreach (var content in contents)
+                    {
+                        var newContent = CreateExpandObject(content);
+                        newContents.Add(newContent);
+                    }
+
+                    dictionary.Add(property.Name, newContents);
+                }
+                else
+                {
+                    dictionary.Add(property.Name, property.GetValue(target));
+                }
             }
 
             return expando;

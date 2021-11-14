@@ -46,9 +46,9 @@ namespace UniversalForumClient.Core
 
         private Post ParsePost(HtmlNode rootNode)
         {
-            var messageTextNode = rootNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
-
             var author = rootNode.Attributes["data-author"].Value;
+
+            var messageTextNode = rootNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
             var contents = ParseContents(messageTextNode);
 
             Post post = new Post(author, contents);
@@ -59,23 +59,23 @@ namespace UniversalForumClient.Core
         private object[] ParseContents(HtmlNode messageNode)
         {
             var contentNodes = messageNode.ChildNodes
-                                                  .Where(w => !(w.Name == "div" &&
+                                                    .Where(w => !(w.Name == "div" &&
                                                                 w.Attributes.Contains("class") &&
                                                                 w.Attributes["class"].Value == "messageTextEndMarker"));
 
             var contents = new List<object>();
 
-            foreach(var contentNode in contentNodes)
+            foreach (var contentNode in contentNodes)
             {
                 var content = ParseContent(contentNode);
                 contents.Add(content);
             }
 
+            contents = FilterUnnecessarySpace(contents);
+
             contents = FilterUnnecessaryContent(contents);
 
             contents = CombineTextContent(contents);
-
-            contents = FilterUnnecessarySpace(contents);
 
             return contents.ToArray();
         }
@@ -84,10 +84,19 @@ namespace UniversalForumClient.Core
         {
             object content = null;
 
-            if (contentNode.Name == "div" && contentNode.Attributes.Contains("data-author"))
+            if (contentNode.Name == "div" && contentNode.Attributes.Contains("class") && contentNode.Attributes["class"].Value.Contains("bbCodeQuote"))
             {
+                var author = string.Empty;
+
+                if (contentNode.Attributes.Contains("data-author"))
+                {
+                    author = contentNode.Attributes["data-author"].Value;
+                }
+
                 var messageTextNode = contentNode.SelectSingleNode(".//div[contains(@class,'quote')]");
-                content = ParseContents(messageTextNode);
+                var childContents = ParseContents(messageTextNode);
+
+                content = new Quote(author, childContents);
             }
             else if (contentNode.Name == "div" && contentNode.Attributes.Contains("class") && contentNode.Attributes["class"].Value.Contains("bbCodeSpoilerContainer"))
             {

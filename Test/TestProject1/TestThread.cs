@@ -45,11 +45,11 @@ namespace TestProject1
                 Directory.CreateDirectory(dir);
             }
 
-            //string jsonString = posts.Cast<object>().Serialize();
+            string jsonString = posts.Cast<object>().Serialize();
 
-            JsonSerializerOptions jso = new JsonSerializerOptions();
-            jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-            string jsonString = JsonSerializer.Serialize(posts, jso);
+            //JsonSerializerOptions jso = new JsonSerializerOptions();
+            //jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+            //string jsonString = JsonSerializer.Serialize(posts, jso);
 
             string serializeOutputFile = string.Format(@"{0}\{1}.json", dir
                                                                  , DateTime.Now.ToString("yyyyMMddHHmmss"));
@@ -107,7 +107,7 @@ namespace TestProject1
             var contents1st = posts.First().Contents;
             var content1st = contents1st.First() as Image;
             Assert.NotNull(content1st);
-            Assert.Equal(expectedContents1st.First().ToString(), content1st.Url);
+            Assert.Equal(expectedContents1st.First().ToString(), content1st.Source);
 
             var content2nd = contents1st.Last() as Text;
             Assert.NotNull(content2nd);

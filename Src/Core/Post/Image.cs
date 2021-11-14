@@ -7,11 +7,11 @@ namespace UniversalForumClient.Core
 {
     public class Image
     {
-        public string Url { get; private set; }
+        public string Source { get; private set; }
 
         public Image(string url)
         {
-            Url = url;
+            Source = url;
         }
     }
 }
