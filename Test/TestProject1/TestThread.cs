@@ -124,18 +124,18 @@ namespace TestProject1
             var posts = await _thread.GetPosts();
 
             // Post count
-            int expectedPostCount = 19;
+            int expectedPostCount = 2;
             Assert.Equal(posts.Count, expectedPostCount);
 
             // Post content
             // 1st post
-            string expectedImage1st = "data/attachments/278/278049-8acb73f2f0067d4d343c8e392b94d921.jpg";
+            string expectedImage1st = "data/attachments/278/278049-8acb73f2f0067d4d343c8e392b94d92175675f245.jpg";
             var contents1st = posts.First().Contents;
             var img1st = (((contents1st.First() as Spoiler).Contents.First() as Hyperlink).Contents.First() as Image).Source;
             Assert.Equal(expectedImage1st, img1st);
 
             // last post
-            string expectedImageLast = "data/attachments/278/278654-771dc7f070c930bd54fb7541ad8b6b65.jpg";
+            string expectedImageLast = "data/attachments/278/278654-771dc7f070c9354365f1290bd54fb7541ad8b6b65.jpg";
             var contentsLast = posts.Last().Contents;
             var imgLast = (((contentsLast.Last() as Spoiler).Contents.Last() as Hyperlink).Contents.Last() as Image).Source;
             Assert.Equal(expectedImageLast, imgLast);
