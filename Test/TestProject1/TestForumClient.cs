@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using UniversalForumClient.Core;
+using UniversalForumClient.Exceptions;
 using Xunit;
 
 namespace TestProject1
@@ -49,6 +50,15 @@ namespace TestProject1
             var loginStatus = await _forumClient.Login("anything", "anything");
 
             Assert.True(loginStatus);
+        }
+
+        [Fact]
+        public void Goto_Invalid_Thread()
+        {
+            var exception = Assert.Throws<ThreadIdNotValid>(() =>
+            {
+                _forumClient.GotoThread(null);
+            });
         }
 
         #endregion Offline data

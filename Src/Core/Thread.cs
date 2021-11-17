@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UniversalForumClient;
+using UniversalForumClient.Exceptions;
 using UniversalForumClient.Http;
 
 namespace UniversalForumClient.Core
@@ -18,7 +19,7 @@ namespace UniversalForumClient.Core
         {
             if (string.IsNullOrEmpty(threadId))
             {
-                throw new Exception("Thread ID can not be empty");
+                throw new ThreadIdNotValid();
             }
         }
 
