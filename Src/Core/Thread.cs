@@ -16,6 +16,10 @@ namespace UniversalForumClient.Core
         public Thread(IHttpClient httpClient, string threadId, int pageNumber = 1)
             : base(BasePage.PageTypes.Thread, httpClient, threadId, pageNumber)
         {
+            if (string.IsNullOrEmpty(threadId))
+            {
+                throw new Exception("Thread ID can not be empty");
+            }
         }
 
         public Thread GotoPage(int pageNumber)

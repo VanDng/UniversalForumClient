@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using UniversalForumClient.Http;
 using Xunit;
 
@@ -9,11 +10,15 @@ namespace TestProject1
     public class TestHttpClient
     {
         [Fact]
-        public void MassRequestSameUri()
+        public async Task MassRequestSameUri()
         {
-            var client = new HttpClientWrapper();
-            var response = client.GetAsync("abc").Result;
-            Assert.Equal(200, (int)response.StatusCode);
+            var stubClient = new HttpClientStub();
+            var client = new HttpClient(stubClient);
+
+            var response = await client.GetAsync("abc");
+            var responseStatus = response.StatusCode;
+
+            Assert.Equal(System.Net.HttpStatusCode.OK, responseStatus);
         }
     }
 }

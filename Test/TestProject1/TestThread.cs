@@ -11,10 +11,8 @@ using Xunit;
 
 namespace TestProject1
 {
-    public class TestThread : IDisposable
+    public class TestThread : TestBase
     {
-        private HttpClientStub _httpClientStub;
-        private HttpClient _httpClient;
         private Thread _thread;
 
         public TestThread()
@@ -23,17 +21,6 @@ namespace TestProject1
             _httpClient = new HttpClient(_httpClientStub);
 
             _thread = new Thread(_httpClient, "99");
-        }
-
-        public void Dispose()
-        {
-            _httpClientStub.Dispose();
-            _httpClient.Dispose();
-        }
-
-        private string TestDataPath(string relativeFilePath)
-        {
-            return Utility.SolutionPath() + @"\Test\TestData\Gvn\" + relativeFilePath;
         }
 
         private void SerializePosts(List<Post> posts)
@@ -60,7 +47,7 @@ namespace TestProject1
         [Fact]
         public async void GetPosts()
         {
-            var testDataFilePath = TestDataPath("thread_html_source.html");
+            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "thread_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -117,7 +104,7 @@ namespace TestProject1
         [Fact]
         public async void GetPosts_Spoiler()
         {
-            var testDataFilePath = TestDataPath("thread_spoiler_html_source.html");
+            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "thread_spoiler_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 

@@ -10,10 +10,8 @@ using Xunit;
 
 namespace TestProject1
 {
-    public class TestForum : IDisposable
+    public class TestForum : TestBase
     {
-        private HttpClientStub _httpClientStub;
-        private HttpClient _httpClient;
         private Forum _forum;
 
         public TestForum()
@@ -22,12 +20,6 @@ namespace TestProject1
             _httpClient = new HttpClient(_httpClientStub);
 
             _forum = new Forum(_httpClient, "99");
-        }
-
-        public void Dispose()
-        {
-            _httpClientStub.Dispose();
-            _httpClient.Dispose();
         }
 
         private string TestDataPath(string relativeFilePath)
@@ -46,7 +38,7 @@ namespace TestProject1
                 "an-choi-tiec-tung.85"
             };
 
-            var testDataFilePath = TestDataPath("forum_html_source.html");
+            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -62,7 +54,7 @@ namespace TestProject1
         {
             int expectedTotalPage = 647;
 
-            var testDataFilePath = TestDataPath("forum_html_source.html");
+            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -109,7 +101,7 @@ namespace TestProject1
                 "gamevn-mens-fashion-noi-quy-ong-lam-dep.1522965"
             };
 
-            var testDataFilePath = TestDataPath("forum_html_source.html");
+            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 

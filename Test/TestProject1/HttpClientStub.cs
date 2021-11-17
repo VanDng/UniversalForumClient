@@ -9,15 +9,15 @@ using UniversalForumClient.Http;
 
 namespace TestProject1
 {
-    class HttpClientStub : IHttpClient
+    public class HttpClientStub : IHttpClient
     {
         private HttpResponseMessage _httpResponseMessage;
 
-        public Uri BaseAddress { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Uri BaseAddress { get; set; }
 
         public HttpClientStub()
         {
-            _httpResponseMessage = new HttpResponseMessage();
+            RefreshHttpReponse();
         }
 
         public void Dispose()
@@ -29,6 +29,7 @@ namespace TestProject1
         {
             _httpResponseMessage = new HttpResponseMessage();
             _httpResponseMessage.StatusCode = HttpStatusCode.OK;
+            _httpResponseMessage.Content = new ByteArrayContent(new byte[] { });
         }
 
         public void SetHttpResponse(HttpStatusCode statusCode)

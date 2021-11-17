@@ -16,14 +16,14 @@ namespace TestProject1
         }
 
         [Fact]
-        public void HttpClientStubGetAsync()
+        public async Task HttpClientStubGetAsync()
         {
             string expectedHtmlSource = "Hello stub world!";
 
             _httpClient.SetHttpResponse(expectedHtmlSource);
 
             var htmlSource = string.Empty;
-            var checkResponse = _httpClient.GetAsync(string.Empty).Result;
+            var checkResponse = await _httpClient.GetAsync(string.Empty);
             if (checkResponse.IsSuccessStatusCode)
             {
                 htmlSource = checkResponse.Content.ReadAsStringAsync().Result;
@@ -33,14 +33,14 @@ namespace TestProject1
         }
 
         [Fact]
-        public void HttpClientStubPostAsync()
+        public async Task HttpClientStubPostAsync()
         {
             string expectedHtmlSource = "Hello stub world!";
 
             _httpClient.SetHttpResponse(expectedHtmlSource);
 
             var htmlSource = string.Empty;
-            var checkResponse = _httpClient.PostAsync(string.Empty, null).Result;
+            var checkResponse = await _httpClient.PostAsync(string.Empty, null);
             if (checkResponse.IsSuccessStatusCode)
             {
                 htmlSource = checkResponse.Content.ReadAsStringAsync().Result;

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UniversalForumClient.Http;
 using System.Net.Http;
+using HttpClient = UniversalForumClient.Http.HttpClient;
 
 namespace UniversalForumClient.Core
 {
@@ -24,11 +25,19 @@ namespace UniversalForumClient.Core
             }
         }
 
-        public ForumClient(string homePageUrl)
+        public ForumClient(string homePageUrl, IHttpClient httpClient = null)
         {
             _homePageUrl = homePageUrl;
 
-            _httpClient = new HttpClientWrapper();
+            if (httpClient == null)
+            {
+                _httpClient = new HttpClient();
+            }
+            else
+            {
+                _httpClient = httpClient;
+            }
+
             _httpClient.BaseAddress = new Uri(_homePageUrl);
 
             _user = null;
@@ -63,7 +72,7 @@ namespace UniversalForumClient.Core
                 {
                     var responseContent = await loginResponse.Content.ReadAsStringAsync();
 
-                    if (responseContent.Contains("Signed in as"))
+                    if (responseContent.Contains("id=\"AccountMenu\""))
                     {
                         isSuccess = true;
                     }
@@ -73,10 +82,16 @@ namespace UniversalForumClient.Core
             return isSuccess;
         }
 
-        public Forum GetForum(string forumId = null)
+        public Forum GotoForum(string forumId = null, int pageNumber = 1)
         {
-            Forum forum = new Forum(_httpClient, forumId);
+            Forum forum = new Forum(_httpClient, forumId, pageNumber);
             return forum;
+        }
+
+        public Thread GotoThread(string threadId, int pageNumber = 1)
+        {
+            Thread thread = new Thread(_httpClient, threadId, pageNumber);
+            return thread;
         }
     }
 }
