@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace UniversalForumClient.Http
 {
     public class HttpClientWrapper : IHttpClient, IDisposable
     {
-        private readonly HttpClient _httpClient;
+        private readonly System.Net.Http.HttpClient _httpClient;
 
         public Uri BaseAddress
         {
@@ -22,7 +23,12 @@ namespace UniversalForumClient.Http
 
         public HttpClientWrapper()
         {
-            _httpClient = new HttpClient();
+            HttpClientHandler handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+
+            _httpClient = new System.Net.Http.HttpClient(handler);
         }
 
         public void Dispose()

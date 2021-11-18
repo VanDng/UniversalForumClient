@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using UniversalForumClient.Config;
 using UniversalForumClient.Core;
 using UniversalForumClient.Extension;
 using UniversalForumClient.Http;
@@ -99,6 +100,15 @@ namespace TestProject1
             var content2nd = contents1st.Last() as Text;
             Assert.NotNull(content2nd);
             Assert.Equal(expectedContents1st.Last().ToString(), content2nd.PlainText);
+
+            // 2nd post
+            var contents2nd = posts[1].Contents;
+            var images2nd = contents2nd.LookupImages();
+            Assert.Equal(2, images2nd.Count());
+            var excludeImages2nd = images2nd.ExcludeHost(BacklistedHost.Items());
+            Assert.Single(excludeImages2nd);
+            var excludeStartWith2nd = excludeImages2nd.ExcludeHostStartWith("images/smilies");
+            Assert.Empty(excludeStartWith2nd);
         }
 
         [Fact]
@@ -127,5 +137,15 @@ namespace TestProject1
             var imgLast = (((contentsLast.Last() as Spoiler).Contents.Last() as Hyperlink).Contents.Last() as Image).Source;
             Assert.Equal(expectedImageLast, imgLast);
         }
+
+        //[Fact]
+        //public async void GetPosts_1()
+        //{
+        //    var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "thread_html_source_1.html");
+        //    var html_sourcce = File.ReadAllText(testDataFilePath);
+        //    _httpClientStub.SetHttpResponse(html_sourcce);
+
+        //    var posts = await _thread.GetPosts();
+        //}
     }
 }

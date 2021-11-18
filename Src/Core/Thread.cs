@@ -1,6 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -37,7 +38,7 @@ namespace UniversalForumClient.Core
             HtmlDocument htmlDocument = new HtmlDocument();
             htmlDocument.LoadHtml(htmlSource);
 
-            var messageList = htmlDocument.DocumentNode.SelectNodes("//ol[@id='messageList']//li");
+            var messageList = htmlDocument.DocumentNode.SelectNodes("//ol[@id='messageList']//li[contains(@class,'message')]");
 
             foreach(var messageNode in messageList)
             {
@@ -51,14 +52,21 @@ namespace UniversalForumClient.Core
 
         private Post ParsePost(HtmlNode rootNode)
         {
-            var author = rootNode.Attributes["data-author"].Value;
+            try
+            {
+                var author = rootNode.Attributes["data-author"].Value;
 
-            var messageTextNode = rootNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
-            var contents = ParseContents(messageTextNode);
+                var messageTextNode = rootNode.SelectSingleNode(".//blockquote[contains(@class,'messageText')]");
+                var contents = ParseContents(messageTextNode);
 
-            Post post = new Post(author, contents);
+                Post post = new Post(author, contents);
+                return post;
+            }
+            catch (Exception ex)
+            {
 
-            return post;
+            }
+            return null;
         }
 
         private object[] ParseContents(HtmlNode messageNode)
@@ -111,7 +119,7 @@ namespace UniversalForumClient.Core
             }
             else if (contentNode.Name == "img")
             {
-                content = new Image(contentNode.Attributes["src"].Value);
+                content = new Image(contentNode.Attributes["src"].Value, _httpClient);
             }
             else if (contentNode.Name == "br")
             {
@@ -203,6 +211,10 @@ namespace UniversalForumClient.Core
                         int preLength = newPlainText.Length;
 
                         sb.Clear();
+                        if (newMarkupText.StartsWith("\r"))
+                        {
+                            sb.Append("\r");
+                        }
                         if (newMarkupText.StartsWith("\n"))
                         {
                             sb.Append("\n");
@@ -235,6 +247,12 @@ namespace UniversalForumClient.Core
                         sb.Remove(sb.Length - 1, 1);
 
                         sb.Insert(0, "\n");
+                        if (newMarkupText.EndsWith(sb.ToString()) == false)
+                        {
+                            sb.Remove(0, 1);
+                        }
+
+                        sb.Insert(0, "\r");
                         if (newMarkupText.EndsWith(sb.ToString()) == false)
                         {
                             sb.Remove(0, 1);

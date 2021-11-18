@@ -75,7 +75,7 @@ namespace UniversalForumClient.Extension
         {
             var images = new List<Image>();
 
-            foreach(var content in contents)
+            foreach (var content in contents)
             {
                 if (content is Image)
                 {
@@ -108,6 +108,24 @@ namespace UniversalForumClient.Extension
             }
 
             return images.ToArray();
+        }
+
+        public static Image[] ExcludeHost(this IEnumerable<Image> images, IEnumerable<string> hosts)
+        {
+            Uri tmp;
+            return images.Where(w => Uri.TryCreate(w.Source, UriKind.Absolute, out tmp) == false ||
+                                     hosts.Contains(new Uri(w.Source).Host) == false)
+                         .ToArray();
+        }
+
+        public static Image[] ExcludeHostStartWith(this IEnumerable<Image> images, string startWith)
+        {
+            return images.ExcludeHostStartWith(new string[] { startWith });
+        }
+
+        public static Image[] ExcludeHostStartWith(this IEnumerable<Image> images, IEnumerable<string> startWiths)
+        {
+            return images.Where(w => startWiths.Any(a => w.Source.StartsWith(a)) == false).ToArray();
         }
     }
 }

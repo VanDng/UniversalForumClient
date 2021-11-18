@@ -97,13 +97,21 @@ namespace UniversalForumClient.Http
             {
                 var orgResponseMessage = await responseTask;
 
-                var orgResponseContent = await orgResponseMessage.Content.ReadAsStringAsync();
+                IEnumerable<string> contentTypes = new string[] { };
+                if (orgResponseMessage.Content.Headers.TryGetValues("Content-Type", out contentTypes))
+                {
+                    if (contentTypes.Count() > 0 &&
+                        contentTypes.Any(a => a == @"text\html"))
+                    {
+                        var orgResponseContent = await orgResponseMessage.Content.ReadAsStringAsync();
 
-                var newResponseContent = HtmlHelper.RemoveInsignificantHtmlWhiteSpace(orgResponseContent);
+                        var newResponseContent = HtmlHelper.RemoveInsignificantHtmlWhiteSpace(orgResponseContent);
 
-                var byteArray = Encoding.UTF8.GetBytes(newResponseContent);
-                var byteArrayContent = new ByteArrayContent(byteArray);
-                orgResponseMessage.Content = byteArrayContent;
+                        var byteArray = Encoding.UTF8.GetBytes(newResponseContent);
+                        var byteArrayContent = new ByteArrayContent(byteArray);
+                        orgResponseMessage.Content = byteArrayContent;
+                    }
+                }
 
                 return orgResponseMessage;
             });
