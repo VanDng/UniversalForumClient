@@ -17,7 +17,7 @@ namespace TestProject1
             _httpClientStub = new HttpClientStub();
             _httpClient = new HttpClient(_httpClientStub);
 
-            _testDataDir = Utility.SolutionPath() + @"\Test\TestData\";
+            _testDataDir = Utility.SolutionPath() + @"\Test\TestData";
         }
 
         public virtual void Dispose()
