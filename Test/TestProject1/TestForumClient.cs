@@ -29,7 +29,7 @@ namespace TestProject1
         [Fact]
         public async Task Offline_Login_Failure()
         {
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "login_failure.html");
+            var testDataFilePath = Path.Combine(_testDataDir, "Gvn", "login_failure.html");
             var testData = File.ReadAllText(testDataFilePath);
 
             _httpClientStub.SetHttpResponse(testData);
@@ -42,7 +42,7 @@ namespace TestProject1
         [Fact]
         public async Task Offline_Login_Success()
         {
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "login_success.html");
+            var testDataFilePath = Path.Combine(_testDataDir, "Gvn", "login_success.html");
             var testData = File.ReadAllText(testDataFilePath);
 
             _httpClientStub.SetHttpResponse(testData);

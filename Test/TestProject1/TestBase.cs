@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using UniversalForumClient.Http;
 
@@ -17,7 +18,7 @@ namespace TestProject1
             _httpClientStub = new HttpClientStub();
             _httpClient = new HttpClient(_httpClientStub);
 
-            _testDataDir = Utility.SolutionPath() + @"\Test\TestData";
+            _testDataDir = Path.Combine(Utility.SolutionPath(), "Test", "TestData");
         }
 
         public virtual void Dispose()

@@ -38,7 +38,7 @@ namespace TestProject1
                 "an-choi-tiec-tung.85"
             };
 
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "forum_html_source.html");
+            var testDataFilePath = Path.Combine(_testDataDir, "Gvn", "forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -54,7 +54,7 @@ namespace TestProject1
         {
             int expectedTotalPage = 647;
 
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "forum_html_source.html");
+            var testDataFilePath = Path.Combine(_testDataDir, "Gvn", "forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -101,7 +101,7 @@ namespace TestProject1
                 "gamevn-mens-fashion-noi-quy-ong-lam-dep.1522965"
             };
 
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "forum_html_source.html");
+            var testDataFilePath = Path.Combine(_testDataDir, "Gvn", "forum_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 

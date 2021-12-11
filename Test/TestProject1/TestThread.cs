@@ -48,7 +48,7 @@ namespace TestProject1
         [Fact]
         public async void GetPosts()
         {
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "thread_html_source.html");
+            var testDataFilePath =Path.Combine(_testDataDir, "Gvn", "thread_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -114,7 +114,7 @@ namespace TestProject1
         [Fact]
         public async void GetPosts_Spoiler()
         {
-            var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "thread_spoiler_html_source.html");
+            var testDataFilePath = Path.Combine(_testDataDir, "Gvn", "thread_spoiler_html_source.html");
             var html_sourcce = File.ReadAllText(testDataFilePath);
             _httpClientStub.SetHttpResponse(html_sourcce);
 
@@ -141,7 +141,7 @@ namespace TestProject1
         //[Fact]
         //public async void GetPosts_1()
         //{
-        //    var testDataFilePath = string.Format(@"{0}\{1}\{2}", _testDataDir, "Gvn", "thread_html_source_1.html");
+        //    var testDataFilePath =Path.Combine(_testDataDir, "Gvn", "thread_html_source_1.html");
         //    var html_sourcce = File.ReadAllText(testDataFilePath);
         //    _httpClientStub.SetHttpResponse(html_sourcce);
 
