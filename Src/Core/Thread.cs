@@ -270,8 +270,12 @@ namespace UniversalForumClient.Core
                         }
                     }
 
-                    var newTextContent = new Text(newPlainText, newMarkupText);
-                    newContents.Add(newTextContent);
+                    if (string.IsNullOrEmpty(newPlainText) == false &&
+                        string.IsNullOrWhiteSpace(newPlainText) == false)
+                    {
+                        var newTextContent = new Text(newPlainText, newMarkupText);
+                        newContents.Add(newTextContent);
+                    }
                 }
                 else
                 {
