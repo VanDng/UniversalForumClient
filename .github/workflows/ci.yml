@@ -23,5 +23,7 @@ jobs:
       run: dotnet build --no-restore --no-incremental
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Pack
+      run: dotnet pack
     - name: Nuget publish
       run: dotnet nuget push ./src/bin/Debug/*.nupkg --api-key ${{ secrets.NUGET_PUSH_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
