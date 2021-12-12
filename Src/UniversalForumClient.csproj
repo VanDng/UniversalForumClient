@@ -13,7 +13,7 @@
 			An open-source project hosted by Github at https://github.com/VanDng/UniversalForumClient.
 		</Description>
 		<PackageId>UniversalForumClient</PackageId>
-		<Version>0.0.2</Version>
+		<Version>0.0.3</Version>
 		<Authors>Van</Authors>
 		<Company>N/A</Company>
 		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
