@@ -10,13 +10,13 @@
 		<Title>Universal Forum Client</Title>
 		<Description>
 			One client for all kinds of forums.
-			This library is an open-source project, hosted by Github https://github.com/VanDng/UniversalForumClient.
-			Disclosure: I develop this library for my personal use, it might not work with your target forum yet.
+			An open-source project hosted by Github at https://github.com/VanDng/UniversalForumClient.
 		</Description>
-		<PackageId>UniservalForumClient</PackageId>
+		<PackageId>UniversalForumClient</PackageId>
 		<Version>0.0.1</Version>
 		<Authors>Van</Authors>
 		<Company>N/A</Company>
+		<PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 	  <PlatformTarget>AnyCPU</PlatformTarget>
